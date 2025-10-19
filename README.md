@@ -1,2 +1,0 @@
-# ForsakenScript
-ScriptMeuPorTubers83hacker
