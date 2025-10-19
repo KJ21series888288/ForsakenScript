@@ -1,288 +1,286 @@
--- LocalScript único para ForsakenGuiS (substitui os LocalScripts individuais)
+-- LocalScript único para criar ForsakenGuiS no PlayerGui
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
-local screenGui = script.Parent
-local openBtn = screenGui:WaitForChild("Open")
-local frame = screenGui:WaitForChild("Frame")
-local espBtn = frame:WaitForChild("EspButton")
-local tpPrBtn = frame:WaitForChild("TPprButton")
-local tpBtn = frame:WaitForChild("TPButton")
-local playerNameBox = frame:WaitForChild("PlayerName")
-local tplBtn = frame:WaitForChild("TPLButton")
-local saveCordBtn = frame:WaitForChild("SaveCord")
-local tpCordBtn = frame:WaitForChild("TpCord")
-local credFrame = screenGui:WaitForChild("Cred")
-local openCredBtn = screenGui:WaitForChild("Opencred")
+-- ======= CRIAÇÃO DA GUI =======
+local ForsakenGuiS = Instance.new("ScreenGui")
+ForsakenGuiS.Name = "ForsakenGuiS"
+ForsakenGuiS.Parent = playerGui
+ForsakenGuiS.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
--- Ensure frame starts closed
-frame.Visible = false
-credFrame.Visible = false
+-- Botão abrir/fechar
+local Open = Instance.new("TextButton")
+Open.Name = "Open"
+Open.Parent = ForsakenGuiS
+Open.BackgroundColor3 = Color3.fromRGB(186,4,4)
+Open.BorderSizePixel = 0
+Open.Position = UDim2.new(0.17,0,0.92,0)
+Open.Size = UDim2.new(0,133,0,36)
+Open.Font = Enum.Font.Unknown
+Open.Text = "#$!??$!&%"
+Open.TextColor3 = Color3.new(0,0,0)
+Open.TextScaled = true
 
-openBtn.MouseButton1Click:Connect(function()
-	frame.Visible = not frame.Visible
-end)
+-- Frame principal
+local Frame = Instance.new("Frame")
+Frame.Name = "Frame"
+Frame.Parent = ForsakenGuiS
+Frame.BackgroundColor3 = Color3.new(0,0,0)
+Frame.BackgroundTransparency = 0.4
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.08,0,0.20,0)
+Frame.Size = UDim2.new(0,449,0,421)
+Frame.Visible = false
 
-openCredBtn.MouseButton1Click:Connect(function()
-	credFrame.Visible = not credFrame.Visible
-end)
-
--- ===== ESP =====
--- Armazenamento por jogador para limpar quando character remove
-local espData = {} -- espData[player] = { highlight = Highlight, billboard = BillboardGui, heartbeatConn = RBXScriptConnection }
-
-local function createBillboardForPlayer(targetPlayer)
-	local char = targetPlayer.Character
-	if not char then return end
-	local head = char:FindFirstChild("Head") or char:FindFirstChild("HumanoidRootPart")
-	if not head then return end
-
-	-- BillboardGui parented ao PlayerGui do jogador local para ser visível somente a ele
-	local billboard = Instance.new("BillboardGui")
-	billboard.Adornee = head
-	billboard.AlwaysOnTop = true
-	billboard.Size = UDim2.new(0, 120, 0, 30)
-	billboard.StudsOffset = Vector3.new(0, 2.5, 0)
-	billboard.Parent = playerGui
-
-	local label = Instance.new("TextLabel")
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.Font = Enum.Font.SourceSansBold
-	label.TextSize = 14
-	label.TextStrokeTransparency = 0.4
-	label.TextColor3 = Color3.new(1,1,1)
-	label.Text = targetPlayer.Name
-	label.Parent = billboard
-
-	return billboard, label
+-- Botões dentro do frame
+local function createButton(name, parent, pos, size, text)
+    local btn = Instance.new("TextButton")
+    btn.Name = name
+    btn.Parent = parent
+    btn.BackgroundTransparency = 1
+    btn.BorderSizePixel = 0
+    btn.Position = pos
+    btn.Size = size
+    btn.Font = Enum.Font.SourceSans
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(255,0,0)
+    btn.TextScaled = true
+    btn.TextWrapped = true
+    return btn
 end
 
-local function createHighlightForCharacter(character)
-	-- Highlight funciona se for parentado no workspace ou no próprio character
-	local highlight = Instance.new("Highlight")
-	highlight.Adornee = character
-	highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-	highlight.FillTransparency = 0.8
-	highlight.OutlineTransparency = 0.2
-	highlight.Parent = workspace
-	return highlight
+local EspButton = createButton("EspButton", Frame, UDim2.new(0.03,0,0.028,0), UDim2.new(0,110,0,27), "Esp")
+local TPprButton = createButton("TPprButton", Frame, UDim2.new(0.29,0,0.028,0), UDim2.new(0,110,0,27), "Tp Jogador Mais Proximo")
+local TPButton = createButton("TPButton", Frame, UDim2.new(0.31,0,0.20,0), UDim2.new(0,110,0,27), "Tp para jogador")
+local TPLButton = createButton("TPLButton", Frame, UDim2.new(0.049,0,0.118,0), UDim2.new(0,110,0,27), "Tp Lugar Alto")
+local SaveCord = createButton("SaveCord", Frame, UDim2.new(0.03,0,0.204,0), UDim2.new(0,110,0,27), "Salvar Cordenadas")
+local TpCord = createButton("TpCord", Frame, UDim2.new(0.03,0,0.294,0), UDim2.new(0,110,0,27), "Teleportar Pra Cordenada")
+
+-- TextBox para nome do jogador
+local PlayerName = Instance.new("TextBox")
+PlayerName.Name = "PlayerName"
+PlayerName.Parent = Frame
+PlayerName.BackgroundTransparency = 1
+PlayerName.BorderSizePixel = 0
+PlayerName.Position = UDim2.new(0.29,0,0.106,0)
+PlayerName.Size = UDim2.new(0,120,0,27)
+PlayerName.Font = Enum.Font.SourceSans
+PlayerName.Text = "Nome Do Jogador"
+PlayerName.TextColor3 = Color3.fromRGB(255,0,0)
+PlayerName.TextSize = 14
+
+-- Label principal
+local NoNm = Instance.new("TextLabel")
+NoNm.Name = "NoNm"
+NoNm.Parent = Frame
+NoNm.BackgroundTransparency = 1
+NoNm.Position = UDim2.new(0.22,0,-0.092,0)
+NoNm.Size = UDim2.new(0,175,0,32)
+NoNm.Font = Enum.Font.Unknown
+NoNm.Text = "Script Forsaken"
+NoNm.TextColor3 = Color3.new(0,0,0)
+NoNm.TextScaled = true
+NoNm.TextWrapped = true
+
+-- Frame de créditos
+local Cred = Instance.new("Frame")
+Cred.Name = "Cred"
+Cred.Parent = ForsakenGuiS
+Cred.BackgroundColor3 = Color3.new(0,0,0)
+Cred.BackgroundTransparency = 0.4
+Cred.BorderSizePixel = 0
+Cred.Position = UDim2.new(0.63,0,0.22,0)
+Cred.Size = UDim2.new(0,449,0,421)
+Cred.Visible = false
+
+local function createLabel(name, parent, pos, size, text)
+    local lbl = Instance.new("TextLabel")
+    lbl.Name = name
+    lbl.Parent = parent
+    lbl.BackgroundTransparency = 1
+    lbl.Position = pos
+    lbl.Size = size
+    lbl.Font = Enum.Font.SourceSans
+    lbl.Text = text
+    lbl.TextColor3 = Color3.fromRGB(182,182,182)
+    lbl.TextScaled = true
+    lbl.TextWrapped = true
+    return lbl
 end
 
-local function cleanupESPForPlayer(p)
-	local data = espData[p]
-	if not data then return end
-	if data.heartbeatConn then
-		data.heartbeatConn:Disconnect()
-		data.heartbeatConn = nil
-	end
-	if data.billboard and data.billboard.Parent then
-		data.billboard:Destroy()
-	end
-	if data.highlight and data.highlight.Parent then
-		data.highlight:Destroy()
-	end
-	espData[p] = nil
-end
+createLabel("Ide", Cred, UDim2.new(0,0,0,0), UDim2.new(0,232,0,50), "Ideia: Tubers83hacker")
+createLabel("Scri", Cred, UDim2.new(0,0,0.11,0), UDim2.new(0,232,0,50), "Scripter: Chat GPT ESP Tps Cordenadas")
+createLabel("Ui", Cred, UDim2.new(0,0,0.26,0), UDim2.new(0,232,0,48), "Ui: ???")
+createLabel("Discord", Cred, UDim2.new(0,0,0.92,0), UDim2.new(0,176,0,31), "Discord Tubers: flowers_1_0")
+createLabel("Discord2", Cred, UDim2.new(0.42,0,0.92,0), UDim2.new(0,176,0,31), "Discord ?? : vl4dky")
 
-local function setupESPForPlayer(targetPlayer)
-	if targetPlayer == player then return end
-	-- evita duplicar
-	if espData[targetPlayer] then return end
+-- Botão abrir créditos
+local Opencred = Instance.new("TextButton")
+Opencred.Name = "Opencred"
+Opencred.Parent = ForsakenGuiS
+Opencred.BackgroundColor3 = Color3.fromRGB(186,4,4)
+Opencred.BorderSizePixel = 0
+Opencred.Position = UDim2.new(0.74,0,0.92,0)
+Opencred.Size = UDim2.new(0,133,0,36)
+Opencred.Font = Enum.Font.Unknown
+Opencred.Text = "Creditos"
+Opencred.TextColor3 = Color3.new(0,0,0)
+Opencred.TextScaled = true
 
-	local function onCharacterLoaded(char)
-		cleanupESPForPlayer(targetPlayer)
-
-		-- cria highlight + billboard
-		local highlight = createHighlightForCharacter(char)
-		local billboard, label = createBillboardForPlayer(targetPlayer)
-		if not billboard then
-			-- falha, limpa highlight
-			if highlight and highlight.Parent then highlight:Destroy() end
-			return
-		end
-
-		-- Heartbeat atualiza distância e checa vida do character
-		local conn
-		conn = RunService.Heartbeat:Connect(function()
-			if not char.Parent or not char:FindFirstChild("HumanoidRootPart") or not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
-				-- personagem saiu -> limpa e desconecta
-				cleanupESPForPlayer(targetPlayer)
-				if conn then conn:Disconnect() end
-				return
-			end
-
-			local myRoot = player.Character:FindFirstChild("HumanoidRootPart")
-			local theirRoot = char:FindFirstChild("HumanoidRootPart")
-			if myRoot and theirRoot and label then
-				local dist = (theirRoot.Position - myRoot.Position).Magnitude
-				label.Text = string.format("%s (%.0fm)", targetPlayer.Name, dist)
-			end
-		end)
-
-		espData[targetPlayer] = {
-			highlight = highlight;
-			billboard = billboard;
-			heartbeatConn = conn;
-		}
-	end
-
-	-- se já tiver character, liga; senão espera carregar
-	if targetPlayer.Character then
-		onCharacterLoaded(targetPlayer.Character)
-	end
-	targetPlayer.CharacterAdded:Connect(onCharacterLoaded)
-	-- também limpa quando o jogador sair do jogo
-	targetPlayer.AncestryChanged:Connect(function()
-		if not targetPlayer:IsDescendantOf(game) then
-			cleanupESPForPlayer(targetPlayer)
-		end
-	end)
-end
-
-espBtn.MouseButton1Click:Connect(function()
-	-- evita ativar várias vezes
-	if _G.ESPAtivo then
-		warn("[ESP] Já está ativo")
-		return
-	end
-	_G.ESPAtivo = true
-	for _, plr in ipairs(Players:GetPlayers()) do
-		setupESPForPlayer(plr)
-	end
-	Players.PlayerAdded:Connect(function(plr) setupESPForPlayer(plr) end)
-	Players.PlayerRemoving:Connect(function(plr) cleanupESPForPlayer(plr) end)
-	print("[ESP] Ativo")
+-- ======= FUNCIONALIDADES =======
+-- Toggle frame principal
+Open.MouseButton1Click:Connect(function()
+    Frame.Visible = not Frame.Visible
 end)
 
--- ===== Teleports =====
-
--- Teleporta perto do jogador mais próximo
-tpPrBtn.MouseButton1Click:Connect(function()
-	local character = player.Character or player.CharacterAdded:Wait()
-	local root = character:FindFirstChild("HumanoidRootPart")
-	if not root then return end
-
-	local closestPlayer
-	local closestDist = math.huge
-	for _, plr in pairs(Players:GetPlayers()) do
-		if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
-			local otherRoot = plr.Character.HumanoidRootPart
-			local dist = (otherRoot.Position - root.Position).Magnitude
-			if dist < closestDist then
-				closestDist = dist
-				closestPlayer = plr
-			end
-		end
-	end
-
-	if closestPlayer and closestPlayer.Character and closestPlayer.Character:FindFirstChild("HumanoidRootPart") then
-		local targetRoot = closestPlayer.Character.HumanoidRootPart
-		local direction = (root.Position - targetRoot.Position)
-		if direction.Magnitude ~= 0 then
-			direction = direction.Unit
-		else
-			direction = Vector3.new(0,0,1)
-		end
-		local newPos = targetRoot.Position + direction * 3
-		root.CFrame = CFrame.new(newPos)
-		print("[TPprButton] Teleportado perto de:", closestPlayer.Name)
-	else
-		warn("[TPprButton] Nenhum jogador próximo encontrado!")
-	end
+-- Toggle frame créditos
+Opencred.MouseButton1Click:Connect(function()
+    Cred.Visible = not Cred.Visible
 end)
 
--- Teleporta para o jogador pelo nome digitado
-tpBtn.MouseButton1Click:Connect(function()
-	local targetName = playerNameBox.Text or ""
-	if targetName == "" then
-		warn("[TPButton] Digite o nome de um jogador!")
-		return
-	end
+-- ====== ESP ======
+local espData = {}
+EspButton.MouseButton1Click:Connect(function()
+    if _G.ESPAtivo then return end
+    _G.ESPAtivo = true
 
-	local targetPlayer
-	for _, plr in pairs(Players:GetPlayers()) do
-		if string.lower(plr.Name) == string.lower(targetName) then
-			targetPlayer = plr
-			break
-		end
-	end
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= player then
+            local function setupCharacter(char)
+                if not char then return end
+                local highlight = Instance.new("Highlight")
+                highlight.Adornee = char
+                highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                highlight.FillTransparency = 0.8
+                highlight.OutlineTransparency = 0.2
+                highlight.Parent = workspace
 
-	if not targetPlayer then
-		warn("[TPButton] Jogador não encontrado no servidor.")
-		return
-	end
+                local head = char:FindFirstChild("Head") or char:FindFirstChild("HumanoidRootPart")
+                if head then
+                    local billboard = Instance.new("BillboardGui")
+                    billboard.Adornee = head
+                    billboard.AlwaysOnTop = true
+                    billboard.Size = UDim2.new(0,120,0,30)
+                    billboard.StudsOffset = Vector3.new(0,2.5,0)
+                    billboard.Parent = playerGui
 
-	local character = player.Character or player.CharacterAdded:Wait()
-	local root = character:FindFirstChild("HumanoidRootPart")
-	if not root then return end
+                    local label = Instance.new("TextLabel")
+                    label.Size = UDim2.new(1,0,1,0)
+                    label.BackgroundTransparency = 1
+                    label.Font = Enum.Font.SourceSansBold
+                    label.TextSize = 14
+                    label.TextStrokeTransparency = 0.4
+                    label.TextColor3 = Color3.new(1,1,1)
+                    label.Text = plr.Name
+                    label.Parent = billboard
 
-	if targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-		local targetRoot = targetPlayer.Character.HumanoidRootPart
-		root.CFrame = targetRoot.CFrame + Vector3.new(0, 3, 0)
-		print("[TPButton] Teleportado até:", targetPlayer.Name)
-	else
-		warn("[TPButton] Jogador existe, mas character não carregou.")
-	end
+                    RunService.Heartbeat:Connect(function()
+                        if not char.Parent then
+                            highlight:Destroy()
+                            billboard:Destroy()
+                            return
+                        end
+                        local myRoot = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+                        local theirRoot = char:FindFirstChild("HumanoidRootPart")
+                        if myRoot and theirRoot then
+                            local dist = (theirRoot.Position - myRoot.Position).Magnitude
+                            label.Text = string.format("%s (%.0fm)", plr.Name, dist)
+                        end
+                    end)
+                end
+            end
+
+            if plr.Character then
+                setupCharacter(plr.Character)
+            end
+            plr.CharacterAdded:Connect(setupCharacter)
+        end
+    end
+
+    Players.PlayerAdded:Connect(function(plr)
+        if plr ~= player then
+            plr.CharacterAdded:Connect(function(char) 
+                if char then
+                    local highlight = Instance.new("Highlight")
+                    highlight.Adornee = char
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    highlight.FillTransparency = 0.8
+                    highlight.OutlineTransparency = 0.2
+                    highlight.Parent = workspace
+                end
+            end)
+        end
+    end)
 end)
 
--- Cria plataforma alta (visível globalmente; highlight faz destaque pra cliente)
-tplBtn.MouseButton1Click:Connect(function()
-	local character = player.Character or player.CharacterAdded:Wait()
-	local root = character and character:FindFirstChild("HumanoidRootPart")
-	if not root then return end
-
-	local part = Instance.new("Part")
-	part.Size = Vector3.new(6,1,6)
-	part.Anchored = true
-	part.CanCollide = true
-	part.Material = Enum.Material.Neon
-	part.Color = Color3.fromRGB(255,0,0)
-	part.Transparency = 0.2
-	part.CFrame = CFrame.new(root.Position + Vector3.new(0,50,0))
-	part.Parent = workspace
-
-	-- highlight client-side (só pra você): parentado no workspace mas adornee aponta pra part
-	local highlight = Instance.new("Highlight")
-	highlight.Adornee = part
-	highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-	highlight.FillTransparency = 0.8
-	highlight.OutlineColor = Color3.fromRGB(255,0,0)
-	highlight.Parent = workspace
-
-	root.CFrame = part.CFrame + Vector3.new(0,3,0)
-
-	print("[TPLButton] Teleportado para o alto!")
-
-	task.delay(4, function()
-		if part and part.Parent then part:Destroy() end
-		if highlight and highlight.Parent then highlight:Destroy() end
-		print("[TPLButton] Plataforma removida.")
-	end)
+-- ===== TELEPORTS =====
+TPprButton.MouseButton1Click:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    local closest, dist = nil, math.huge
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= player and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            local d = (plr.Character.HumanoidRootPart.Position - root.Position).Magnitude
+            if d < dist then dist, closest = d, plr end
+        end
+    end
+    if closest then
+        local dir = (root.Position - closest.Character.HumanoidRootPart.Position).Unit
+        root.CFrame = CFrame.new(closest.Character.HumanoidRootPart.Position + dir*3)
+        print("Teleportado perto de:", closest.Name)
+    end
 end)
 
--- ===== Salvar / Teleportar Coordenada =====
--- Recomendo usar Attributes ou ModuleScript para persistência; aqui uso _G pra simplicidade cliente
-_G.SavedCFrame = _G.SavedCFrame or nil
-
-saveCordBtn.MouseButton1Click:Connect(function()
-	local character = player.Character or player.CharacterAdded:Wait()
-	local root = character:FindFirstChild("HumanoidRootPart")
-	if not root then return end
-	_G.SavedCFrame = root.CFrame
-	print(string.format("[SaveCord] Coordenada salva em: X=%.2f, Y=%.2f, Z=%.2f", root.Position.X, root.Position.Y, root.Position.Z))
+TPButton.MouseButton1Click:Connect(function()
+    local targetName = PlayerName.Text
+    if targetName == "" then return end
+    local targetPlayer
+    for _, plr in pairs(Players:GetPlayers()) do
+        if string.lower(plr.Name) == string.lower(targetName) then
+            targetPlayer = plr
+            break
+        end
+    end
+    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+        local root = player.Character.HumanoidRootPart
+        root.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(0,3,0)
+    end
 end)
 
-tpCordBtn.MouseButton1Click:Connect(function()
-	if not _G.SavedCFrame then
-		warn("[TpCord] Nenhuma coordenada salva! Use 'Salvar Cordenadas' primeiro.")
-		return
-	end
-	local character = player.Character or player.CharacterAdded:Wait()
-	local root = character:FindFirstChild("HumanoidRootPart")
-	if not root then return end
-	root.CFrame = _G.SavedCFrame + Vector3.new(0,3,0)
-	print("[TpCord] Teleportado para coordenada salva.")
+TPLButton.MouseButton1Click:Connect(function()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    local part = Instance.new("Part")
+    part.Size = Vector3.new(6,1,6)
+    part.Anchored = true
+    part.CanCollide = true
+    part.Material = Enum.Material.Neon
+    part.Color = Color3.fromRGB(255,0,0)
+    part.Transparency = 0.2
+    part.CFrame = CFrame.new(root.Position + Vector3.new(0,50,0))
+    part.Parent = workspace
+    root.CFrame = part.CFrame + Vector3.new(0,3,0)
+    task.delay(4,function()
+        part:Destroy()
+    end)
+end)
+
+-- ===== SALVAR / TELEPORTAR COORD =====
+_G.SavedCFrame = nil
+SaveCord.MouseButton1Click:Connect(function()
+    local root = player.Character.HumanoidRootPart
+    _G.SavedCFrame = root.CFrame
+    print("Coordenada salva!")
+end)
+
+TpCord.MouseButton1Click:Connect(function()
+    if _G.SavedCFrame then
+        local root = player.Character.HumanoidRootPart
+        root.CFrame = _G.SavedCFrame + Vector3.new(0,3,0)
+        print("Teleportado para coordenada salva!")
+    end
 end)
